@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
-const API_URL = '/api';
+const API_URL = 'https://homeautomation-v1.onrender.com/api';
 
 export default function App() {
   const [token, setToken] = useState(localStorage.getItem('token'));
