@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Smart Home Automations</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --bg-card: rgba(30, 41, 59, 0.7);
+            --primary: #8b5cf6;
+            --primary-hover: #7c3aed;
+            --secondary: #3b82f6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(139, 92, 246, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.15) 0px, transparent 50%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Glassmorphism Classes */
+        .glass {
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: var(--glass-shadow);
+        }
+
+        h1, h2, h3, h4 { font-weight: 600; }
+
+        /* Typography & Layout */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            width: 100%;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, #a78bfa, #60a5fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border-radius: 12px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6);
+        }
+
+        .btn-outline {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            border: 1px solid var(--glass-border);
+        }
+
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Forms */
+        .form-group { margin-bottom: 1.5rem; text-align: left; }
+        label { display: block; margin-bottom: 0.5rem; color: var(--text-muted); font-size: 0.9rem; }
+        input {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            color: white;
+            outline: none;
+            transition: border-color 0.3s;
+            font-size: 1rem;
+        }
+        input:focus { border-color: var(--primary); }
+
+        /* Auth Sections */
+        .auth-container {
+            max-width: 400px;
+            margin: 4rem auto;
+            text-align: center;
+            padding: 2.5rem;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .auth-container h2 { margin-bottom: 2rem; font-size: 2rem; }
+        .switch-auth { margin-top: 1.5rem; color: var(--text-muted); cursor: pointer; transition: color 0.3s; }
+        .switch-auth:hover { color: var(--primary); }
+
+        /* Dashboard specific */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            animation: slideDown 0.5s ease-out;
+        }
+
+        .devices-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .device-card {
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .device-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .device-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 1rem;
+        }
+        
+        .status-badge {
+            font-size: 0.8rem;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+        .status-online { background: rgba(16, 185, 129, 0.2); color: var(--success); }
+        .status-offline { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+
+        .relay-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .relay-item {
+            background: rgba(15, 23, 42, 0.4);
+            border-radius: 12px;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s;
+        }
+
+        .relay-info { display: flex; flex-direction: column; gap: 4px; }
+        .relay-name { font-size: 0.95rem; font-weight: 500; }
+        .relay-state { font-size: 0.8rem; color: var(--text-muted); }
+
+        /* Custom Toggle Switch */
+        .switch { position: relative; display: inline-block; width: 50px; height: 26px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(255, 255, 255, 0.1);
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute; content: ""; height: 20px; width: 20px;
+            left: 3px; bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        input:checked + .slider { background: linear-gradient(135deg, var(--primary), var(--secondary)); }
+        input:checked + .slider:before { transform: translateX(24px); }
+
+        /* Modal */
+        .modal {
+            display: none; position: fixed; z-index: 1000; left: 0; top: 0;
+            width: 100%; height: 100%; overflow: auto;
+            background-color: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            align-items: center; justify-content: center;
+        }
+        .modal-content {
+            width: 100%; max-width: 500px;
+            padding: 2rem;
+            animation: zoomIn 0.3s ease-out;
+        }
+        .close-btn { color: white; float: right; font-size: 1.5rem; cursor: pointer; transition: color 0.3s; }
+        .close-btn:hover { color: var(--danger); }
+
+        .token-display {
+            background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 10px;
+            text-align: center; font-family: monospace; font-size: 1.2rem;
+            margin-top: 1rem; color: var(--secondary); letter-spacing: 2px;
+            word-break: break-all;
+        }
+
+        /* Loading */
+        .loader {
+            display: none; border: 4px solid rgba(255,255,255,0.1); border-top: 4px solid var(--primary);
+            border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 2rem auto;
+        }
+
+        /* Layout pages */
+        #auth-page, #dashboard-page { display: none; }
+        .active-page { display: block !important; }
+
+        /* Toast */
+        #toast {
+            visibility: hidden; min-width: 250px; background-color: var(--primary); color: #fff;
+            text-align: center; border-radius: 8px; padding: 16px; position: fixed; z-index: 2000;
+            right: 30px; bottom: 30px; font-size: 17px;
+            box-shadow: 0 5px 15px rgba(139, 92, 246, 0.3);
+        }
+        #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes zoomIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes fadein { from { bottom: 0; opacity: 0; } to { bottom: 30px; opacity: 1; } }
+        @keyframes fadeout { from { bottom: 30px; opacity: 1; } to { bottom: 0; opacity: 0; } }
+
+        @media (max-width: 768px) {
+            .devices-grid { grid-template-columns: 1fr; }
+            .relay-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="glass" style="margin: 1rem 2rem;">
+        <div class="logo">
+            <i class="fa-solid fa-house-signal"></i> SmartHome
+        </div>
+        <div id="nav-actions" style="display:none;">
+            <span id="user-greeting" style="margin-right: 15px; font-weight: 500;"></span>
+            <button class="btn btn-outline" id="logout-btn">
+                <i class="fa-solid fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+    </nav>
+
+    <!-- App Container -->
+    <div class="container">
+
+        <!-- AUTH PAGE -->
+        <div id="auth-page" class="active-page">
+            <div class="glass auth-container" id="login-section">
+                <h2>Welcome Back</h2>
+                <form id="login-form" onsubmit="event.preventDefault(); document.getElementById('login-btn').click();">
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="login-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="login-password" required>
+                    </div>
+                    <button type="submit" id="login-btn" class="btn btn-primary" style="width: 100%;">Log In</button>
+                </form>
+                <div class="switch-auth" id="to-register">Don't have an account? Sign up</div>
+            </div>
+
+            <div class="glass auth-container" id="register-section" style="display:none;">
+                <h2>Create Account</h2>
+                <form id="register-form" onsubmit="event.preventDefault(); document.getElementById('register-btn').click();">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="reg-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="reg-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="reg-password" required>
+                    </div>
+                    <button type="submit" id="register-btn" class="btn btn-primary" style="width: 100%;">Sign Up</button>
+                </form>
+                <div class="switch-auth" id="to-login">Already have an account? Log in</div>
+            </div>
+        </div>
+
+        <!-- DASHBOARD PAGE -->
+        <div id="dashboard-page">
+            <div class="dashboard-header">
+                <div>
+                    <h1>My Devices</h1>
+                    <p style="color: var(--text-muted); margin-top: 5px;">Manage your smart home network</p>
+                </div>
+                <button class="btn btn-primary" id="add-device-btn">
+                    <i class="fa-solid fa-plus"></i> Add Device
+                </button>
+            </div>
+
+            <div class="loader" id="dashboard-loader"></div>
+            
+            <div class="devices-grid" id="devices-container">
+                <!-- Devices will be injected here via JS -->
+            </div>
+            
+            <div id="empty-state" style="display:none; text-align:center; padding: 4rem; color: var(--text-muted);">
+                <i class="fa-solid fa-microchip" style="font-size: 4rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                <h3>No devices found</h3>
+                <p>Click the 'Add Device' button to connect your first ESP32 board.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- MODAL (Add Device) -->
+    <div id="add-modal" class="modal">
+        <div class="glass modal-content">
+            <span class="close-btn" id="close-modal">&times;</span>
+            <h2 style="margin-bottom: 1.5rem;">Add New Device</h2>
+            
+            <div id="modal-step-1">
+                <div class="form-group">
+                    <label>Device Name (e.g. Living Room)</label>
+                    <input type="text" id="new-device-name" required placeholder="Living Room Relays">
+                </div>
+                <div class="form-group">
+                    <label>WiFi SSID</label>
+                    <input type="text" id="new-device-ssid" placeholder="Home Network Name">
+                </div>
+                <div class="form-group">
+                    <label>WiFi Password</label>
+                    <input type="text" id="new-device-pass" placeholder="Network Password">
+                </div>
+
+                <div class="form-group">
+                    <label>Remote MAC Address (Optional)</label>
+                    <input type="text" id="new-device-rmac" placeholder="XX:XX:XX:XX:XX:XX">
+                </div>
+                <div class="form-group">
+                    <label>Relay Count</label>
+                    <input type="number" id="new-device-relay-count" min="1" max="16" value="8">
+                </div>
+                <button type="button" id="generate-token-btn" class="btn btn-primary" style="width: 100%;">Generate Token</button>
+            </div>
+
+            <div id="modal-step-2" style="display:none; text-align:center;">
+                <i class="fa-solid fa-check-circle" style="color: var(--success); font-size: 3rem; margin-bottom: 1rem;"></i>
+                <h3>Device Added Successfully!</h3>
+                <p style="margin-top: 1rem; color: var(--text-muted);">Enter this token in your ESP32 configuration portal:</p>
+                
+                <div class="token-display" id="generated-token">A1B2C3D4E5F6G7H8</div>
+                
+                <button class="btn btn-outline" id="copy-token-btn" style="margin-top: 1.5rem; width: 100%;">
+                    <i class="fa-regular fa-copy"></i> Copy Token
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast">Message</div>
+
+    <!-- FRONTEND LOGIC -->
+    <script>
+        const API_URL = '/api'; // Use local since it's served from same express app
+        let currentToken = localStorage.getItem('token');
+        let pollingInterval = null;
+
+        // Elements
+        const authPage = document.getElementById('auth-page');
+        const dashboardPage = document.getElementById('dashboard-page');
+        const loginSection = document.getElementById('login-section');
+        const registerSection = document.getElementById('register-section');
+        const navActions = document.getElementById('nav-actions');
+        const toast = document.getElementById('toast');
+        const modal = document.getElementById('add-modal');
+        const devicesContainer = document.getElementById('devices-container');
+
+        // Initialize
+        if (currentToken) {
+            showDashboard();
+        }
+
+        // Utils
+        function showToast(msg, isError = false) {
+            toast.textContent = msg;
+            toast.style.backgroundColor = isError ? 'var(--danger)' : 'var(--primary)';
+            toast.className = "show";
+            setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
+        }
+
+        function apiCall(endpoint, method, body = null) {
+            const headers = { 'Content-Type': 'application/json' };
+            if (currentToken) headers['Authorization'] = `Bearer ${currentToken}`;
+            
+            const config = { method, headers };
+            if (body) config.body = JSON.stringify(body);
+            
+            return fetch(`${API_URL}${endpoint}`, config)
+                .then(async res => {
+                    const data = await res.json();
+                    if (!res.ok) throw new Error(data.error || 'API Error');
+                    return data;
+                });
+        }
+
+        // UI toggles
+        document.getElementById('to-register').onclick = () => {
+            loginSection.style.display = 'none';
+            registerSection.style.display = 'block';
+        };
+        document.getElementById('to-login').onclick = () => {
+            registerSection.style.display = 'none';
+            loginSection.style.display = 'block';
+        };
+
+        // Auth
+        document.getElementById('login-btn').onclick = async () => {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            if(!email || !password) return showToast('Please enter email and password', true);
+
+            try {
+                const data = await apiCall('/login', 'POST', { email, password });
+                currentToken = data.token;
+                localStorage.setItem('token', currentToken);
+                localStorage.setItem('user', JSON.stringify(data.user));
+                showToast('Login successful!');
+                showDashboard();
+            } catch (err) { showToast(err.message, true); }
+        };
+
+        document.getElementById('register-btn').onclick = async () => {
+            const name = document.getElementById('reg-name').value;
+            const email = document.getElementById('reg-email').value;
+            const password = document.getElementById('reg-password').value;
+            if(!name || !email || !password) return showToast('Please fill all fields', true);
+
+            try {
+                const data = await apiCall('/register', 'POST', { name, email, password });
+                currentToken = data.token;
+                localStorage.setItem('token', currentToken);
+                localStorage.setItem('user', JSON.stringify(data.user));
+                showToast('Registration successful!');
+                showDashboard();
+            } catch (err) { showToast(err.message, true); }
+        };
+
+        document.getElementById('logout-btn').onclick = () => {
+            currentToken = null;
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            if (pollingInterval) clearInterval(pollingInterval);
+            authPage.classList.add('active-page');
+            dashboardPage.classList.remove('active-page');
+            navActions.style.display = 'none';
+        };
+
+        // Dashboard
+        function showDashboard() {
+            authPage.classList.remove('active-page');
+            dashboardPage.classList.add('active-page');
+            navActions.style.display = 'block';
+            
+            const user = JSON.parse(localStorage.getItem('user'));
+            if(user) document.getElementById('user-greeting').textContent = `Hi, ${user.name}`;
+            
+            fetchDevices();
+            // Start polling every 3 seconds for fast real-time feel
+            if (pollingInterval) clearInterval(pollingInterval);
+            pollingInterval = setInterval(fetchDevices, 3000);
+        }
+
+        async function fetchDevices() {
+            try {
+                const data = await apiCall('/devices', 'GET');
+                renderDevices(data.devices);
+            } catch (err) {
+                if(err.message.includes('authenticate')) document.getElementById('logout-btn').click();
+            }
+        }
+
+        function renderDevices(devices) {
+            if (!devices || devices.length === 0) {
+                document.getElementById('empty-state').style.display = 'block';
+                devicesContainer.innerHTML = '';
+                return;
+            }
+            
+            document.getElementById('empty-state').style.display = 'none';
+            
+            // Only rebuild HTML if count changes, otherwise selectively update components to preserve focus/clicks
+            if (devicesContainer.children.length !== devices.length) {
+                devicesContainer.innerHTML = '';
+                
+                devices.forEach(device => {
+                    let relaysHtml = '';
+                    const relayCount = device.relayCount || 8;
+                    
+                    for(let i=0; i<relayCount; i++) {
+                        relaysHtml += `
+                            <div class="relay-item">
+                                <div class="relay-info">
+                                    <span class="relay-name">Relay ${i+1}</span>
+                                    <span class="relay-state" id="state-text-${device._id}-${i}">OFF</span>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" id="checkbox-${device._id}-${i}" onchange="toggleRelay('${device._id}', ${i}, this.checked)">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        `;
+                    }
+
+                    const cardHtml = `
+                        <div class="device-card glass">
+                            <div class="device-header">
+                                <div>
+                                    <h3 style="margin-bottom: 5px;">${device.name}</h3>
+                                    <div style="font-size:0.8rem; color:var(--text-muted); font-family:monospace;">ID: ${device.token.substring(0,8)}...</div>
+                                </div>
+                                <div id="status-container-${device._id}"></div>
+                            </div>
+                            <div class="relay-grid">
+                                ${relaysHtml}
+                            </div>
+                        </div>
+                    `;
+                    devicesContainer.insertAdjacentHTML('beforeend', cardHtml);
+                });
+            }
+
+            // Sync state carefully without recreating HTML DOM elements
+            devices.forEach(device => {
+                const isOnline = device.status === 'online';
+                const statusContainer = document.getElementById(`status-container-${device._id}`);
+                if (statusContainer) {
+                    statusContainer.innerHTML = isOnline 
+                        ? `<span class="status-badge status-online"><i class="fa-solid fa-wifi"></i> Online</span>`
+                        : `<span class="status-badge status-offline"><i class="fa-solid fa-wifi-slash" style="opacity:0.6"></i> Offline</span>`;
+                }
+
+                const relaysObj = device.relays || {};
+                const relayCount = device.relayCount || 8;
+                
+                for(let i=0; i<relayCount; i++) {
+                    const state = relaysObj[i] || false;
+                    const checkbox = document.getElementById(`checkbox-${device._id}-${i}`);
+                    const stateText = document.getElementById(`state-text-${device._id}-${i}`);
+                    
+                    if (checkbox && document.activeElement !== checkbox) {
+                        checkbox.checked = state;
+                        checkbox.disabled = !isOnline;
+                    }
+                    if (stateText) {
+                        stateText.textContent = state ? 'ON' : 'OFF';
+                    }
+                }
+            });
+        }
+
+        // Control
+        async function toggleRelay(deviceId, relay, state) {
+            try {
+                await apiCall('/control', 'POST', { deviceId, relay, state });
+                // We don't need to manually update UI because polling takes care of it,
+                // but local toggle keeps it smooth until the next poll.
+            } catch (err) {
+                showToast('Failed to update relay', true);
+                fetchDevices(); // Revert on fail
+            }
+        }
+
+        // Modal
+        document.getElementById('add-device-btn').onclick = () => {
+            document.getElementById('modal-step-1').style.display = 'block';
+            document.getElementById('modal-step-2').style.display = 'none';
+            document.getElementById('new-device-name').value = '';
+            modal.style.display = 'flex';
+        };
+
+        document.getElementById('close-modal').onclick = () => modal.style.display = 'none';
+        window.onclick = (e) => { if (e.target == modal) modal.style.display = 'none'; };
+
+        document.getElementById('generate-token-btn').onclick = async () => {
+            try {
+                const name = document.getElementById('new-device-name').value;
+                if(!name) return showToast('Device Name is required', true);
+                
+                const wifiSSID = document.getElementById('new-device-ssid').value;
+                const wifiPassword = document.getElementById('new-device-pass').value;
+                const remoteMAC = document.getElementById('new-device-rmac').value;
+                const relayCount = parseInt(document.getElementById('new-device-relay-count').value, 10) || 8;
+
+                const data = await apiCall('/create-token', 'POST', { 
+                    name, wifiSSID, wifiPassword, relayCount, remoteMAC 
+                });
+                
+                document.getElementById('modal-step-1').style.display = 'none';
+                document.getElementById('modal-step-2').style.display = 'block';
+                document.getElementById('generated-token').textContent = data.device.token;
+                
+                fetchDevices();
+            } catch (err) { showToast(err.message, true); }
+        };
+
+        document.getElementById('copy-token-btn').onclick = () => {
+            const token = document.getElementById('generated-token').textContent;
+            navigator.clipboard.writeText(token);
+            showToast('Token copied to clipboard!');
+        };
+    </script>
+</body>
+</html>

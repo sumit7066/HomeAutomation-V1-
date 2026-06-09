@@ -1,0 +1,10 @@
+Board name = New 1 = MAC: 3C:8A:1F:0B:42:48
+Board name = New 2 = MAC: 8C:4F:00:3A:2B:70
+Board name = old 1 = MAC: C0:CD:D6:8E:AF:3C
+Board name = old 2 = MAC: 28:56:2F:4B:65:78
+
+Last tokken = D412D45B85584B29
+
+How to erase esp32 
+Step1 = pip instal esptool 
+Step2 = esptool.py -chip esp32 --port CoM7 erase_flash
